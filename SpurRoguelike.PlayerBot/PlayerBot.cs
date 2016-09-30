@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using SpurRoguelike.Core;
-using SpurRoguelike.Core.Entities;
 using SpurRoguelike.Core.Primitives;
 using SpurRoguelike.Core.Views;
 
@@ -11,10 +9,10 @@ namespace SpurRoguelike.PlayerBot
 {
     public class PlayerBot : IPlayerController
     {
+        private const int maxHealth = 100;
+        private const double panicHealth = maxHealth*0.50;
         public State<PlayerBot> State;
         public int Health { get; private set; }
-        private const int maxHealth = 100;
-        private const double panicHealth = maxHealth * 0.5;
         public int Defence { get; private set; }
         public int Attack { get; private set; }
         public Location Location { get; private set; }
@@ -23,9 +21,9 @@ namespace SpurRoguelike.PlayerBot
         public Turn MakeTurn(LevelView levelView, IMessageReporter messageReporter)
         {
             UpdateInfo(levelView);
-        if (State == null)
+            if (State == null)
                 State = new StateIdle(this);
-            
+
             return State.MakeTurn(levelView);
         }
 
@@ -42,7 +40,8 @@ namespace SpurRoguelike.PlayerBot
             return a.IsInRange(b, 1);
         }
 
-        private static IEnumerable<Location> BFS(LevelView levelView, Func<Location, bool> isTarget, bool acceptPickup = false)
+        private static IEnumerable<Location> BFS(LevelView levelView, Func<Location, bool> isTarget,
+            bool acceptPickup = false)
         {
             var queue = new Queue<Location>();
             var start = levelView.Player.Location;
@@ -55,24 +54,24 @@ namespace SpurRoguelike.PlayerBot
             {
                 var current = queue.Dequeue();
                 if (isTarget(current))
-                    return FindPath(levelView, current, pred);
+                    return RevertPath(levelView, current, pred);
 
                 foreach (var offset in Offset.StepOffsets)
                 {
                     var next = current + offset;
 
-                    if (!visited.Contains(next) && levelView.Field[next] > CellType.Trap)
+                    if (!visited.Contains(next) && (levelView.Field[next] > CellType.Trap))
                     {
-                       if ((levelView.GetHealthPackAt(next).HasValue || levelView.GetItemAt(next).HasValue))
-                         if (!acceptPickup)
-                             continue;
+                        if (levelView.GetHealthPackAt(next).HasValue || levelView.GetItemAt(next).HasValue)
+                            if (!acceptPickup)
+                                continue;
                         queue.Enqueue(next);
                         visited.Add(next);
                         pred[next] = current;
                     }
                 }
             }
-            var path = FindPath(levelView, levelView.Player.Location, pred);
+            var path = RevertPath(levelView, levelView.Player.Location, pred);
             if (!path.Any())
                 path = BFS(levelView, isTarget, true);
 
@@ -143,7 +142,7 @@ namespace SpurRoguelike.PlayerBot
                 notOpened.Remove(toOpen);
 
                 if (isTarget(toOpen))
-                    return FindPath(levelView, toOpen, prev);
+                    return RevertPath(levelView, toOpen, prev);
 
                 foreach (var stepOffset in Offset.StepOffsets)
                 {
@@ -158,10 +157,11 @@ namespace SpurRoguelike.PlayerBot
                     }
                 }
             }
-            return FindPath(levelView, current, prev);
+            return RevertPath(levelView, current, prev);
         }
 
-        private static IEnumerable<Location> FindPath(LevelView levelView, Location target, Dictionary<Location, Location> prev)
+        private static IEnumerable<Location> RevertPath(LevelView levelView, Location target,
+            Dictionary<Location, Location> prev)
         {
             var last = target;
             var path = new List<Location>();
@@ -184,12 +184,12 @@ namespace SpurRoguelike.PlayerBot
 
             public override Turn MakeTurn(LevelView levelView)
             {
-                if (Bot.Health < panicHealth && levelView.HealthPacks.Any())
+                if ((Bot.Health < panicHealth) && levelView.HealthPacks.Any())
                 {
                     GoToState(() => new StateHeal(Bot));
                     return Bot.State.MakeTurn(levelView);
                 }
-                if (Bot.Health > panicHealth && levelView.Monsters.Any())
+                if ((Bot.Health > panicHealth) && levelView.Monsters.Any())
                 {
                     GoToState(() => new StateAttack(Bot));
                     return Bot.State.MakeTurn(levelView);
@@ -224,12 +224,12 @@ namespace SpurRoguelike.PlayerBot
 
             public override Turn MakeTurn(LevelView levelView)
             {
-                if (levelView.Monsters.Any() && Bot.Health > panicHealth)
+                if (levelView.Monsters.Any() && (Bot.Health > panicHealth))
                 {
                     GoToState(() => new StateAttack(Bot));
                     return Bot.State.MakeTurn(levelView);
                 }
-                if ((!levelView.Monsters.Any() && (Bot.Health == maxHealth) || !levelView.HealthPacks.Any()))
+                if ((!levelView.Monsters.Any() && (Bot.Health == maxHealth)) || !levelView.HealthPacks.Any())
                 {
                     GoToState(() => new StateFindExit(Bot));
                     return Bot.State.MakeTurn(levelView);
@@ -273,7 +273,7 @@ namespace SpurRoguelike.PlayerBot
                     levelView.Player.TryGetEquippedItem(out currentItem);
                     if (GetItemValue(currentItem) < GetItemValue(bestItem))
                     {
-                        var pathToBestItem = BFS(levelView, (location) => location == bestItem.Location, true);
+                        var pathToBestItem = BFS(levelView, location => location == bestItem.Location, true);
                         return Turn.Step(pathToBestItem.First() - levelView.Player.Location);
                     }
                     GoToState(() => new StateFindExit(Bot));
@@ -281,8 +281,8 @@ namespace SpurRoguelike.PlayerBot
                 }
 
                 var nearestItem =
-                        levelView.Items.OrderBy(i => (i.Location - levelView.Player.Location).Size())
-                            .FirstOrDefault();
+                    levelView.Items.OrderBy(i => (i.Location - levelView.Player.Location).Size())
+                        .FirstOrDefault();
                 var nearestMonster =
                     levelView.Monsters.OrderBy(i => (i.Location - levelView.Player.Location).Size())
                         .FirstOrDefault();
@@ -309,7 +309,7 @@ namespace SpurRoguelike.PlayerBot
 
             public override Turn MakeTurn(LevelView levelView)
             {
-                if ((Bot.Health < panicHealth) && levelView.HealthPacks.Any())
+                if (Bot.Health < panicHealth && levelView.HealthPacks.Any())
                 {
                     GoToState(() => new StateIdle(Bot));
                     return Bot.State.MakeTurn(levelView);
@@ -349,7 +349,7 @@ namespace SpurRoguelike.PlayerBot
                     GoToState(() => new StateIdle(Bot));
                     return Bot.State.MakeTurn(levelView);
                 }
-                if (levelView.Player.Health != maxHealth && levelView.HealthPacks.Any())
+                if ((levelView.Player.Health != maxHealth) && levelView.HealthPacks.Any())
                 {
                     GoToState(() => new StateHeal(Bot));
                     return Bot.State.MakeTurn(levelView);
