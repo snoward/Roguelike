@@ -11,9 +11,10 @@ namespace SpurRoguelike.PlayerBot
 {
     public class PlayerBot : IPlayerController
     {
-        private const int maxHealth = 100;
         public State<PlayerBot> State;
         public int Health { get; private set; }
+        private const int maxHealth = 100;
+        private const double panicHealth = maxHealth * 0.5;
         public int Defence { get; private set; }
         public int Attack { get; private set; }
         public Location Location { get; private set; }
@@ -21,13 +22,10 @@ namespace SpurRoguelike.PlayerBot
 
         public Turn MakeTurn(LevelView levelView, IMessageReporter messageReporter)
         {
-            //Thread.Sleep(100);
             UpdateInfo(levelView);
-
-            if (State == null)
+        if (State == null)
                 State = new StateIdle(this);
-            messageReporter.ReportMessage(State.ToString());
-
+            
             return State.MakeTurn(levelView);
         }
 
@@ -84,21 +82,20 @@ namespace SpurRoguelike.PlayerBot
         private static int[,] CalculateInfluence(LevelView levelView)
         {
             const int safeDistance = 3;
-            const int influenceValue = 10;
+            const int monsterInfluence = 15;
+            const int wallInfluence = 10;
             var cost = new int[levelView.Field.Width, levelView.Field.Height];
 
             for (var y = 0; y < levelView.Field.Height; y++)
                 for (var x = 0; x < levelView.Field.Width; x++)
                 {
                     var position = new Location(x, y);
-                    //if (levelView.Field[position] == CellType.Wall)
-                    //    continue;
                     foreach (var monster in levelView.Monsters)
                     {
                         var distance = (monster.Location - position).Size();
                         if (distance > safeDistance)
                             continue;
-                        cost[x, y] += (int) (influenceValue/Math.Pow(2, distance - safeDistance));
+                        cost[x, y] += (int) (monsterInfluence/Math.Pow(2, distance - safeDistance));
                     }
                     if (levelView.Field[position] == CellType.Wall)
                         foreach (var offset in Offset.StepOffsets)
@@ -106,7 +103,7 @@ namespace SpurRoguelike.PlayerBot
                             var help = position + offset;
                             if ((help.X > 0) && (help.X < levelView.Field.Width) && (help.Y > 0) &&
                                 (help.Y < levelView.Field.Height))
-                                cost[help.X, help.Y] += 40;
+                                cost[help.X, help.Y] += wallInfluence;
                         }
                     cost[x, y] = cost[x, y] == 0 ? 1 : cost[x, y];
                 }
@@ -117,7 +114,6 @@ namespace SpurRoguelike.PlayerBot
         private static IEnumerable<Location> Dijkstra(LevelView levelView, Func<Location, bool> isTarget)
         {
             var cost = CalculateInfluence(levelView);
-            HtmlGenerator.WriteHtml(levelView, cost, @"C:\Users\Mikhail\Downloads\HtmlGenerator\result\index.html");
             var current = levelView.Player.Location;
             var dist = new Dictionary<Location, int> {[current] = 0};
             var prev = new Dictionary<Location, Location>();
@@ -188,7 +184,6 @@ namespace SpurRoguelike.PlayerBot
 
             public override Turn MakeTurn(LevelView levelView)
             {
-                const double panicHealth = 50;
                 if (Bot.Health < panicHealth && levelView.HealthPacks.Any())
                 {
                     GoToState(() => new StateHeal(Bot));
@@ -223,8 +218,6 @@ namespace SpurRoguelike.PlayerBot
 
         private class StateHeal : State<PlayerBot>
         {
-            private const int panicHealth = 50;
-
             public StateHeal(PlayerBot self) : base(self)
             {
             }
@@ -310,8 +303,6 @@ namespace SpurRoguelike.PlayerBot
 
         private class StateAttack : State<PlayerBot>
         {
-            private const double panicHealth = maxHealth*0.5;
-
             public StateAttack(PlayerBot self) : base(self)
             {
             }
