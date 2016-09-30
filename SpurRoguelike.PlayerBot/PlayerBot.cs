@@ -204,7 +204,11 @@ namespace SpurRoguelike.PlayerBot
                     GoToState(() => new StateHeal(Bot));
                     return Bot.State.MakeTurn(levelView);
                 }
-
+                if (Bot.Health < panicHealth && !levelView.HealthPacks.Any())
+                {
+                    GoToState(() => new StateAttack(Bot));
+                    return Bot.State.MakeTurn(levelView);
+                }
                 var exitLocation = levelView.Field.GetCellsOfType(CellType.Exit).FirstOrDefault();
                 var path = BFS(levelView, location => location == exitLocation);
                 return Turn.Step(path.First() - levelView.Player.Location);
