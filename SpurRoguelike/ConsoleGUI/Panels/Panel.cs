@@ -27,7 +27,8 @@ namespace SpurRoguelike.ConsoleGUI.Panels
 
         protected void DrawFullWidthMessage(int clientLeft, int clientTop, ConsoleMessage message)
         {
-            Screen.Write(ClientZone.Left + clientLeft, ClientZone.Top + clientTop, message, ClientZone.Width - clientLeft);
+            Screen.Write(ClientZone.Left + clientLeft, ClientZone.Top + clientTop, message,
+                ClientZone.Width - clientLeft);
         }
 
         private void DrawHorizontalLine(int left, int top, int length)

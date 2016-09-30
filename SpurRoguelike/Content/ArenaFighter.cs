@@ -10,8 +10,8 @@ namespace SpurRoguelike.Content
         public ArenaFighter(string name, int attack, int defence, int health, int healthMaximum, double skill)
             : base(name, attack, defence, health, healthMaximum)
         {
-            sightRadius = (int)(10 + 20 * skill);
-            panicHealthLimit = healthMaximum / 10;
+            sightRadius = (int) (10 + 20*skill);
+            panicHealthLimit = healthMaximum/10;
             state = new StateIdle(this);
         }
 
@@ -36,7 +36,8 @@ namespace SpurRoguelike.Content
             base.TakeDamage(damage, instigator);
         }
 
-        private double GetFitnessToFightWith(Pawn opponent, out bool needMoreHealth, out bool needMoreAttack, out bool needMoreDefence)
+        private double GetFitnessToFightWith(Pawn opponent, out bool needMoreHealth, out bool needMoreAttack,
+            out bool needMoreDefence)
         {
             needMoreHealth = needMoreAttack = needMoreDefence = false;
 
@@ -46,14 +47,14 @@ namespace SpurRoguelike.Content
                 return 0;
             }
 
-            var predictedDamageToOpponent = (int) (((double) TotalAttack / opponent.TotalDefence) * 9);
+            var predictedDamageToOpponent = (int) (((double) TotalAttack/opponent.TotalDefence)*9);
 
             if (predictedDamageToOpponent >= opponent.Health)
                 return 1;
 
-            var predictedDamageToSelf = (int) (((double) opponent.TotalAttack / TotalDefence) * 10);
+            var predictedDamageToSelf = (int) (((double) opponent.TotalAttack/TotalDefence)*10);
 
-            var damageToTake = Math.Ceiling((double) opponent.Health / predictedDamageToOpponent) * predictedDamageToSelf;
+            var damageToTake = Math.Ceiling((double) opponent.Health/predictedDamageToOpponent)*predictedDamageToSelf;
 
             if (damageToTake >= Health)
             {
@@ -70,10 +71,10 @@ namespace SpurRoguelike.Content
                 return 0.5;
             }
 
-            if (Health < HealthMaximum * 0.6)
+            if (Health < HealthMaximum*0.6)
                 needMoreHealth = true;
 
-            if (damageToTake >= Health / 2)
+            if (damageToTake >= Health/2)
             {
                 needMoreAttack = true;
                 needMoreDefence = true;
@@ -84,7 +85,7 @@ namespace SpurRoguelike.Content
 
         private double GetItemValue(Item item)
         {
-            return item.AttackBonus * 1.2 + item.DefenceBonus;
+            return item.AttackBonus*1.2 + item.DefenceBonus;
         }
 
         private bool TryAvoidObstacle(ref Offset stepDirection)
@@ -92,7 +93,8 @@ namespace SpurRoguelike.Content
             var attempts = 0;
             while (attempts < 3)
             {
-                if (Level.Field[Location + stepDirection] <= CellType.Trap || Level.GetEntity<Entity>(Location + stepDirection) != null)
+                if (Level.Field[Location + stepDirection] <= CellType.Trap ||
+                    Level.GetEntity<Entity>(Location + stepDirection) != null)
                 {
                     stepDirection = stepDirection.Turn(1);
                     attempts++;
@@ -140,18 +142,25 @@ namespace SpurRoguelike.Content
                     return;
                 }
 
-                var seenItem = Self.Level.Items.Where(i => Self.IsInRange(i, Self.sightRadius)).OrderByDescending(Self.GetItemValue).FirstOrDefault();
+                var seenItem =
+                    Self.Level.Items.Where(i => Self.IsInRange(i, Self.sightRadius))
+                        .OrderByDescending(Self.GetItemValue)
+                        .FirstOrDefault();
 
-                if (seenItem != null && (Self.EquippedItem == null || Self.GetItemValue(Self.EquippedItem) < Self.GetItemValue(seenItem)))
+                if (seenItem != null &&
+                    (Self.EquippedItem == null || Self.GetItemValue(Self.EquippedItem) < Self.GetItemValue(seenItem)))
                 {
                     Self.objective = seenItem;
                     GoToState(() => new StateSeeObjective(Self));
                     return;
                 }
 
-                if (Self.Health < Self.HealthMaximum * 0.9)
+                if (Self.Health < Self.HealthMaximum*0.9)
                 {
-                    var seenHealth = Self.Level.HealthPacks.Where(i => Self.IsInRange(i, Self.sightRadius)).OrderBy(i => (i.Location - Self.Location).Size()).FirstOrDefault();
+                    var seenHealth =
+                        Self.Level.HealthPacks.Where(i => Self.IsInRange(i, Self.sightRadius))
+                            .OrderBy(i => (i.Location - Self.Location).Size())
+                            .FirstOrDefault();
 
                     if (seenHealth != null)
                     {
@@ -192,8 +201,9 @@ namespace SpurRoguelike.Content
                 bool needMoreHealth;
                 bool needMoreAttack;
                 bool needMoreDefence;
-                var fitness = Self.GetFitnessToFightWith(Self.enemy, out needMoreHealth, out needMoreAttack, out needMoreDefence);
-                
+                var fitness = Self.GetFitnessToFightWith(Self.enemy, out needMoreHealth, out needMoreAttack,
+                    out needMoreDefence);
+
                 if (fitness >= 0.8)
                 {
                     if (Self.IsInAttackRange(Self.enemy))
@@ -213,7 +223,8 @@ namespace SpurRoguelike.Content
 
                     if (hasObjective)
                     {
-                        var stepToObjective = Offset.StepOffsets.FirstOrDefault(o => Self.Location + o == Self.objective.Location);
+                        var stepToObjective =
+                            Offset.StepOffsets.FirstOrDefault(o => Self.Location + o == Self.objective.Location);
 
                         if (stepToObjective != default(Offset))
                         {
@@ -230,7 +241,9 @@ namespace SpurRoguelike.Content
                             return;
                         }
 
-                        var offsetToTarget = hasObjective ? Self.objective.Location - Self.Location : Self.enemy.Location - Self.Location;
+                        var offsetToTarget = hasObjective
+                            ? Self.objective.Location - Self.Location
+                            : Self.enemy.Location - Self.Location;
 
                         var stepDirection = offsetToTarget.SnapToStep(Self.Level.Random);
 
@@ -239,7 +252,9 @@ namespace SpurRoguelike.Content
                     }
                     else
                     {
-                        var offsetToTarget = hasObjective ? Self.objective.Location - Self.Location : -(Self.enemy.Location - Self.Location);
+                        var offsetToTarget = hasObjective
+                            ? Self.objective.Location - Self.Location
+                            : -(Self.enemy.Location - Self.Location);
 
                         var stepDirection = offsetToTarget.SnapToStep(Self.Level.Random);
 
@@ -262,7 +277,10 @@ namespace SpurRoguelike.Content
                     if (Self.objective is HealthPack)
                         return true;
 
-                    var seenHealth = Self.Level.HealthPacks.Where(i => Self.IsInRange(i, Self.sightRadius)).OrderBy(i => (i.Location - Self.Location).Size()).FirstOrDefault();
+                    var seenHealth =
+                        Self.Level.HealthPacks.Where(i => Self.IsInRange(i, Self.sightRadius))
+                            .OrderBy(i => (i.Location - Self.Location).Size())
+                            .FirstOrDefault();
 
                     if (seenHealth != null)
                     {
@@ -282,7 +300,10 @@ namespace SpurRoguelike.Content
 
                     var seenItem = Self.Level.Items
                         .Where(i => Self.IsInRange(i, Self.sightRadius))
-                        .Where(i => (!needMoreAttack || i.AttackBonus > Self.EquippedItem?.AttackBonus) && (!needMoreDefence || i.DefenceBonus > Self.EquippedItem?.DefenceBonus))
+                        .Where(
+                            i =>
+                                (!needMoreAttack || i.AttackBonus > Self.EquippedItem?.AttackBonus) &&
+                                (!needMoreDefence || i.DefenceBonus > Self.EquippedItem?.DefenceBonus))
                         .OrderBy(Self.GetItemValue).FirstOrDefault();
 
                     if (seenItem != null)
@@ -323,7 +344,8 @@ namespace SpurRoguelike.Content
                     return;
                 }
 
-                var stepToObjective = Offset.StepOffsets.FirstOrDefault(o => Self.Location + o == Self.objective.Location);
+                var stepToObjective =
+                    Offset.StepOffsets.FirstOrDefault(o => Self.Location + o == Self.objective.Location);
 
                 if (stepToObjective != default(Offset))
                 {

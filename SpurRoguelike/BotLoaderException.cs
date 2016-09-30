@@ -4,12 +4,12 @@ namespace SpurRoguelike
 {
     internal class BotLoaderException : Exception
     {
-        public BotLoaderException(string message) 
+        public BotLoaderException(string message)
             : base(message)
         {
         }
 
-        public BotLoaderException(string message, Exception innerException) 
+        public BotLoaderException(string message, Exception innerException)
             : base(message, innerException)
         {
         }

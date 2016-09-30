@@ -1,0 +1,44 @@
+table {
+  border-collapse: collapse;
+}
+
+TD {
+    padding: 0px; /* Поля вокруг содержимого таблицы */
+    border: 1px solid black; /* Параметры рамки */
+    width: 32px;
+    height: 32px;
+   }
+
+td.Wall {
+     background-image: url("Wall.png");
+   }
+
+td.PawnView {
+  background-image: url("Dimwit.png");
+}
+
+td.Player {
+  background-image: url("Player.png");
+}
+
+td.Health {
+  background-image: url("Health.png");
+}
+
+td.Item {
+  background-image: url("Item.png");
+}
+
+td.Exit {
+  background-image: url("Exit.png");
+}
+
+td.Trap
+{
+    background-image: url("Trap.png");
+}
+
+TH {
+   padding: 0px; /* Поля вокруг содержимого таблицы */
+   border: 1px solid black; /* Параметры рамки */
+  }

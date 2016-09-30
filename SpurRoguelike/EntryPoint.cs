@@ -56,11 +56,12 @@ namespace SpurRoguelike
 
             var gui = new ConsoleGui(new TextScreen());
 
-            var playerController = options.PlayerController == null ?
-                new ConsolePlayerController(gui) :
-                BotLoader.LoadPlayerController(options.PlayerController);
+            var playerController = options.PlayerController == null
+                ? new ConsolePlayerController(gui)
+                : BotLoader.LoadPlayerController(options.PlayerController);
 
-            var engine = new Engine(options.PlayerName, playerController, levels.First(), new ConsoleRenderer(gui), new ConsoleEventReporter(gui));
+            var engine = new Engine(options.PlayerName, playerController, levels.First(), new ConsoleRenderer(gui),
+                new ConsoleEventReporter(gui));
 
             engine.GameLoop();
         }
@@ -75,22 +76,61 @@ namespace SpurRoguelike
             var itemClassesGenerator = new ItemClassesGenerator(seed, nameGenerator);
 
             var itemClasses = itemClassesGenerator.Generate(7,
-                new ItemClassOptions { Level = 3, Rarity = 1 },
-                new ItemClassOptions { Level = 10, Rarity = 0.15 },
-                new ItemClassOptions { Level = 30, Rarity = 0.1 });
+                new ItemClassOptions {Level = 3, Rarity = 1},
+                new ItemClassOptions {Level = 10, Rarity = 0.15},
+                new ItemClassOptions {Level = 30, Rarity = 0.1});
 
             var monsterClasses = monsterClassesGenerator.Generate(5,
-                new MonsterClassOptions { Skill = 0.5, Rarity = 0.02, Factory = (name, skill, health, attack, defence) => new Dimwit(name, attack, defence, health, health) },
-                new MonsterClassOptions { Skill = 0.6, Rarity = 0.04, Factory = (name, skill, health, attack, defence) => new Dimwit(name, attack, defence, health, health) },
-                new MonsterClassOptions { Skill = 0.6, Rarity = 0.06, Factory = (name, skill, health, attack, defence) => new Reptiloid(name, attack, defence, health, health, skill) },
-                new MonsterClassOptions { Skill = 0.7, Rarity = 0.1, Factory = (name, skill, health, attack, defence) => new Dimwit(name, attack, defence, health, health) },
-                new MonsterClassOptions { Skill = 0.7, Rarity = 0.2, Factory = (name, skill, health, attack, defence) => new Reptiloid(name, attack, defence, health, health, skill) },
-                new MonsterClassOptions { Skill = 0.8, Rarity = 1, Factory = (name, skill, health, attack, defence) => new Reptiloid(name, attack, defence, health, health, skill) });
-          
+                new MonsterClassOptions
+                {
+                    Skill = 0.5,
+                    Rarity = 0.02,
+                    Factory =
+                        (name, skill, health, attack, defence) => new Dimwit(name, attack, defence, health, health)
+                },
+                new MonsterClassOptions
+                {
+                    Skill = 0.6,
+                    Rarity = 0.04,
+                    Factory =
+                        (name, skill, health, attack, defence) => new Dimwit(name, attack, defence, health, health)
+                },
+                new MonsterClassOptions
+                {
+                    Skill = 0.6,
+                    Rarity = 0.06,
+                    Factory =
+                        (name, skill, health, attack, defence) =>
+                                new Reptiloid(name, attack, defence, health, health, skill)
+                },
+                new MonsterClassOptions
+                {
+                    Skill = 0.7,
+                    Rarity = 0.1,
+                    Factory =
+                        (name, skill, health, attack, defence) => new Dimwit(name, attack, defence, health, health)
+                },
+                new MonsterClassOptions
+                {
+                    Skill = 0.7,
+                    Rarity = 0.2,
+                    Factory =
+                        (name, skill, health, attack, defence) =>
+                                new Reptiloid(name, attack, defence, health, health, skill)
+                },
+                new MonsterClassOptions
+                {
+                    Skill = 0.8,
+                    Rarity = 1,
+                    Factory =
+                        (name, skill, health, attack, defence) =>
+                                new Reptiloid(name, attack, defence, health, health, skill)
+                });
+
             var levels = new List<Level>();
 
             var settings = FillDefaultSettings();
-            
+
             for (int i = 0; i < count - 1; i++)
             {
                 levels.Add(levelGenerator.Generate(settings, monsterClasses, itemClasses));
@@ -106,10 +146,18 @@ namespace SpurRoguelike
             }
 
             var lastLevelSettigns = FillLastLevelSettings();
-            var lastLevelMonsterClasses = monsterClassesGenerator.Generate(1, 
-                new MonsterClassOptions { Skill = 1.2, Rarity = 1, Factory = (name, skill, health, attack, defence) => new ArenaFighter(name, attack, defence, health, health, skill) });
+            var lastLevelMonsterClasses = monsterClassesGenerator.Generate(1,
+                new MonsterClassOptions
+                {
+                    Skill = 1.2,
+                    Rarity = 1,
+                    Factory =
+                        (name, skill, health, attack, defence) =>
+                                new ArenaFighter(name, attack, defence, health, health, skill)
+                });
 
-            var lastLevel = new ArenaGenerator(seed, nameGenerator).Generate(lastLevelSettigns, lastLevelMonsterClasses, itemClasses);
+            var lastLevel = new ArenaGenerator(seed, nameGenerator).Generate(lastLevelSettigns, lastLevelMonsterClasses,
+                itemClasses);
 
             levels[levels.Count - 1].SetNextLevel(lastLevel);
 

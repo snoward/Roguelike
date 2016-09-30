@@ -25,7 +25,7 @@ namespace SpurRoguelike.ConsoleGUI.MouseDriver
                     InputRecord record;
                     if (!ReadConsoleInput(inputHandle, out record, 1, out numberOfEvents))
                         throw new Win32Exception(Marshal.GetLastWin32Error());
-                    if (numberOfEvents == 0 || !Enum.IsDefined(typeof (EventType), record.EventType))
+                    if (numberOfEvents == 0 || !Enum.IsDefined(typeof(EventType), record.EventType))
                         continue;
 
                     if (record.EventType == EventType.MouseEvent)
@@ -64,8 +64,9 @@ namespace SpurRoguelike.ConsoleGUI.MouseDriver
         private static extern bool GetNumberOfConsoleInputEvents(IntPtr consoleHandle, out int numberOfEvents);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool ReadConsoleInput(IntPtr consoleInputHandle, out InputRecord inputRecord, int recordCount, out int numberOfEventsRead);
-        
+        private static extern bool ReadConsoleInput(IntPtr consoleInputHandle, out InputRecord inputRecord,
+            int recordCount, out int numberOfEventsRead);
+
         private const int InputHandle = -10;
 
         #endregion

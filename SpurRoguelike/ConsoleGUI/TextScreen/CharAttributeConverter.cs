@@ -15,7 +15,8 @@ namespace SpurRoguelike.ConsoleGUI.TextScreen
                     attributes |= CharAttributes.ForegroundIntensity;
                     break;
                 case ConsoleColor.Gray:
-                    attributes |= CharAttributes.ForegroundRed | CharAttributes.ForegroundGreen | CharAttributes.ForegroundBlue;
+                    attributes |= CharAttributes.ForegroundRed | CharAttributes.ForegroundGreen |
+                                  CharAttributes.ForegroundBlue;
                     break;
                 case ConsoleColor.DarkBlue:
                     attributes |= CharAttributes.ForegroundBlue;
@@ -36,7 +37,8 @@ namespace SpurRoguelike.ConsoleGUI.TextScreen
                     attributes |= CharAttributes.ForegroundRed | CharAttributes.ForegroundGreen;
                     break;
                 case ConsoleColor.White:
-                    attributes |= CharAttributes.ForegroundRed | CharAttributes.ForegroundGreen | CharAttributes.ForegroundBlue | CharAttributes.ForegroundIntensity;
+                    attributes |= CharAttributes.ForegroundRed | CharAttributes.ForegroundGreen |
+                                  CharAttributes.ForegroundBlue | CharAttributes.ForegroundIntensity;
                     break;
                 case ConsoleColor.Blue:
                     attributes |= CharAttributes.ForegroundBlue | CharAttributes.ForegroundIntensity;
@@ -45,16 +47,19 @@ namespace SpurRoguelike.ConsoleGUI.TextScreen
                     attributes |= CharAttributes.ForegroundGreen | CharAttributes.ForegroundIntensity;
                     break;
                 case ConsoleColor.Cyan:
-                    attributes |= CharAttributes.ForegroundGreen | CharAttributes.ForegroundBlue | CharAttributes.ForegroundIntensity;
+                    attributes |= CharAttributes.ForegroundGreen | CharAttributes.ForegroundBlue |
+                                  CharAttributes.ForegroundIntensity;
                     break;
                 case ConsoleColor.Red:
                     attributes |= CharAttributes.ForegroundRed | CharAttributes.ForegroundIntensity;
                     break;
                 case ConsoleColor.Magenta:
-                    attributes |= CharAttributes.ForegroundRed | CharAttributes.ForegroundBlue | CharAttributes.ForegroundIntensity;
+                    attributes |= CharAttributes.ForegroundRed | CharAttributes.ForegroundBlue |
+                                  CharAttributes.ForegroundIntensity;
                     break;
                 case ConsoleColor.Yellow:
-                    attributes |= CharAttributes.ForegroundRed | CharAttributes.ForegroundGreen | CharAttributes.ForegroundIntensity;
+                    attributes |= CharAttributes.ForegroundRed | CharAttributes.ForegroundGreen |
+                                  CharAttributes.ForegroundIntensity;
                     break;
             }
 
@@ -64,7 +69,8 @@ namespace SpurRoguelike.ConsoleGUI.TextScreen
                     attributes |= CharAttributes.BackgroundIntensity;
                     break;
                 case ConsoleColor.Gray:
-                    attributes |= CharAttributes.BackgroundRed | CharAttributes.BackgroundGreen | CharAttributes.BackgroundBlue;
+                    attributes |= CharAttributes.BackgroundRed | CharAttributes.BackgroundGreen |
+                                  CharAttributes.BackgroundBlue;
                     break;
                 case ConsoleColor.DarkBlue:
                     attributes |= CharAttributes.BackgroundBlue;
@@ -85,7 +91,8 @@ namespace SpurRoguelike.ConsoleGUI.TextScreen
                     attributes |= CharAttributes.BackgroundRed | CharAttributes.BackgroundGreen;
                     break;
                 case ConsoleColor.White:
-                    attributes |= CharAttributes.BackgroundRed | CharAttributes.BackgroundGreen | CharAttributes.BackgroundBlue | CharAttributes.BackgroundIntensity;
+                    attributes |= CharAttributes.BackgroundRed | CharAttributes.BackgroundGreen |
+                                  CharAttributes.BackgroundBlue | CharAttributes.BackgroundIntensity;
                     break;
                 case ConsoleColor.Blue:
                     attributes |= CharAttributes.BackgroundBlue | CharAttributes.BackgroundIntensity;
@@ -94,16 +101,19 @@ namespace SpurRoguelike.ConsoleGUI.TextScreen
                     attributes |= CharAttributes.BackgroundGreen | CharAttributes.BackgroundIntensity;
                     break;
                 case ConsoleColor.Cyan:
-                    attributes |= CharAttributes.BackgroundGreen | CharAttributes.BackgroundBlue | CharAttributes.BackgroundIntensity;
+                    attributes |= CharAttributes.BackgroundGreen | CharAttributes.BackgroundBlue |
+                                  CharAttributes.BackgroundIntensity;
                     break;
                 case ConsoleColor.Red:
                     attributes |= CharAttributes.BackgroundRed | CharAttributes.BackgroundIntensity;
                     break;
                 case ConsoleColor.Magenta:
-                    attributes |= CharAttributes.BackgroundRed | CharAttributes.BackgroundBlue | CharAttributes.BackgroundIntensity;
+                    attributes |= CharAttributes.BackgroundRed | CharAttributes.BackgroundBlue |
+                                  CharAttributes.BackgroundIntensity;
                     break;
                 case ConsoleColor.Yellow:
-                    attributes |= CharAttributes.BackgroundRed | CharAttributes.BackgroundGreen | CharAttributes.BackgroundIntensity;
+                    attributes |= CharAttributes.BackgroundRed | CharAttributes.BackgroundGreen |
+                                  CharAttributes.BackgroundIntensity;
                     break;
             }
 

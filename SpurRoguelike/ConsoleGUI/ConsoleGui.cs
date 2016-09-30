@@ -16,7 +16,7 @@ namespace SpurRoguelike.ConsoleGUI
             mouseDriver = new ConsoleMouseDriver(this);
 
             Console.CursorSize = 100;
-            
+
             LayoutScreen();
             DrawInterface();
         }
@@ -53,7 +53,7 @@ namespace SpurRoguelike.ConsoleGUI
                 var key = mouseDriver.WaitForInput();
 
                 Console.CancelKeyPress += (sender, args) =>
-                    args.Cancel = true;
+                        args.Cancel = true;
 
                 switch (key.Key)
                 {
@@ -119,8 +119,9 @@ namespace SpurRoguelike.ConsoleGUI
         public void EndGame(bool isCompleted)
         {
             var gameOverPanel = new MessagePanel(screen,
-                isCompleted ? new ConsoleMessage("WELCOME TO FREEDOM", ConsoleColor.DarkGreen, ConsoleColor.Gray) :
-                              new ConsoleMessage("GAME OVER", ConsoleColor.DarkRed, ConsoleColor.Gray));
+                isCompleted
+                    ? new ConsoleMessage("WELCOME TO FREEDOM", ConsoleColor.DarkGreen, ConsoleColor.Gray)
+                    : new ConsoleMessage("GAME OVER", ConsoleColor.DarkRed, ConsoleColor.Gray));
 
             levelViewportPanel.RedrawContents();
             statsPanel.RedrawContents();
@@ -152,20 +153,30 @@ namespace SpurRoguelike.ConsoleGUI
 
         private void LayoutScreen()
         {
-            var levelBlockHeight = (int) (screen.Height * 0.8);
-            var levelBlockWidth = (int) (screen.Width * 0.6);
-            var statsBlockHeight = (int) (levelBlockHeight * 0.6);
+            var levelBlockHeight = (int) (screen.Height*0.8);
+            var levelBlockWidth = (int) (screen.Width*0.6);
+            var statsBlockHeight = (int) (levelBlockHeight*0.6);
 
-            levelViewportPanel = new LevelViewportPanel(new ScreenZone(-1, -1, levelBlockWidth, levelBlockHeight), 
+            levelViewportPanel = new LevelViewportPanel(new ScreenZone(-1, -1, levelBlockWidth, levelBlockHeight),
                 screen, () => level);
-            messagesPanel = new MessagesPanel(new ScreenZone(-1, levelBlockHeight - 2, screen.Width + 2, screen.Height - levelBlockHeight + 2), 
-                screen);
-            statsPanel = new StatsPanel(new ScreenZone(levelBlockWidth - 2, -1, screen.Width - levelBlockWidth + 2, statsBlockHeight), 
-                screen, () => level?.Player);
-            infoPanel = new InfoPanel(new ScreenZone(levelBlockWidth - 2, statsBlockHeight - 2, screen.Width - levelBlockWidth + 2, levelBlockHeight - statsBlockHeight + 1), 
-                screen, () => level, () => levelViewportPanel.TranslateCoords(cursorLeft - levelViewportPanel.ClientZone.Left, cursorTop - levelViewportPanel.ClientZone.Top));
+            messagesPanel =
+                new MessagesPanel(
+                    new ScreenZone(-1, levelBlockHeight - 2, screen.Width + 2, screen.Height - levelBlockHeight + 2),
+                    screen);
+            statsPanel =
+                new StatsPanel(
+                    new ScreenZone(levelBlockWidth - 2, -1, screen.Width - levelBlockWidth + 2, statsBlockHeight),
+                    screen, () => level?.Player);
+            infoPanel =
+                new InfoPanel(
+                    new ScreenZone(levelBlockWidth - 2, statsBlockHeight - 2, screen.Width - levelBlockWidth + 2,
+                        levelBlockHeight - statsBlockHeight + 1),
+                    screen, () => level,
+                    () =>
+                        levelViewportPanel.TranslateCoords(cursorLeft - levelViewportPanel.ClientZone.Left,
+                            cursorTop - levelViewportPanel.ClientZone.Top));
         }
-        
+
         private void DrawInterface()
         {
             levelViewportPanel.RedrawBorder();
@@ -217,7 +228,7 @@ namespace SpurRoguelike.ConsoleGUI
         private MessagesPanel messagesPanel;
         private StatsPanel statsPanel;
         private InfoPanel infoPanel;
-        
+
         private Level level;
 
         private readonly ITextScreen screen;

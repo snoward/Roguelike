@@ -4,7 +4,7 @@ namespace SpurRoguelike.ConsoleGUI.Panels
 {
     internal class MessagesPanel : Panel
     {
-        public MessagesPanel(ScreenZone zone, ITextScreen screen) 
+        public MessagesPanel(ScreenZone zone, ITextScreen screen)
             : base(zone, screen)
         {
             messages = new List<ConsoleMessage>();

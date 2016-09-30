@@ -10,7 +10,7 @@ using SpurRoguelike.Core.Views;
 
 namespace SpurRoguelike.PlayerBot
 {
-    internal abstract class State<T> where T : IPlayerController
+    public abstract class State<T> where T : PlayerBot
     {   
         protected State(T self)
         {
@@ -22,6 +22,5 @@ namespace SpurRoguelike.PlayerBot
         public abstract void GoToState<TState>(Func<TState> factory) where TState : State<T>;
 
         protected T Bot;
-        protected LevelView levelView;
     }
 }

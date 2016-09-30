@@ -39,7 +39,8 @@ namespace SpurRoguelike.ConsoleGUI.TextScreen
             if (left < 0 || left >= Width || top < 0 || top >= Height)
                 return;
 
-            frameBuffer[top, left] = new CharInfo(character.Character, CharAttributeConverter.MakeCharAttributes(character.Color, character.BackgroundColor));
+            frameBuffer[top, left] = new CharInfo(character.Character,
+                CharAttributeConverter.MakeCharAttributes(character.Color, character.BackgroundColor));
         }
 
         public void Fill(ScreenZone zone, ConsoleCharacter character)
@@ -71,13 +72,16 @@ namespace SpurRoguelike.ConsoleGUI.TextScreen
         public void Render()
         {
             var consoleRect = new SmallRect(0, 0, (short) Width, (short) Height);
-            WriteConsoleOutput(consoleHandle, frameBuffer, new Coord((short) Width, (short) Height), new Coord(0, 0), ref consoleRect);
+            WriteConsoleOutput(consoleHandle, frameBuffer, new Coord((short) Width, (short) Height), new Coord(0, 0),
+                ref consoleRect);
         }
 
         public void Render(ScreenZone zone)
         {
-            var consoleRect = new SmallRect((short) zone.Left, (short) zone.Top, (short) (zone.Width + zone.Left - 1), (short) (zone.Height + zone.Top - 1));
-            WriteConsoleOutput(consoleHandle, frameBuffer, new Coord((short) Width, (short) Height), new Coord((short) zone.Left, (short) zone.Top), ref consoleRect);
+            var consoleRect = new SmallRect((short) zone.Left, (short) zone.Top, (short) (zone.Width + zone.Left - 1),
+                (short) (zone.Height + zone.Top - 1));
+            WriteConsoleOutput(consoleHandle, frameBuffer, new Coord((short) Width, (short) Height),
+                new Coord((short) zone.Left, (short) zone.Top), ref consoleRect);
         }
 
         public int Width { get; private set; }
@@ -109,11 +113,13 @@ namespace SpurRoguelike.ConsoleGUI.TextScreen
         #region WinApi imports
 
         [DllImport("kernel32.dll")]
-        private static extern IntPtr CreateFile(string fileName, int desiredAccess, int shareMode, IntPtr securityAttributes, int creationDisposition, int flagsAndAttributes, IntPtr templateFile);
+        private static extern IntPtr CreateFile(string fileName, int desiredAccess, int shareMode,
+            IntPtr securityAttributes, int creationDisposition, int flagsAndAttributes, IntPtr templateFile);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-        private static extern bool WriteConsoleOutput(IntPtr consoleHandle, CharInfo[,] charBuffer, Coord bufferSize, Coord bufferOffset, ref SmallRect writeRegion);
-        
+        private static extern bool WriteConsoleOutput(IntPtr consoleHandle, CharInfo[,] charBuffer, Coord bufferSize,
+            Coord bufferOffset, ref SmallRect writeRegion);
+
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetConsoleWindow();
 

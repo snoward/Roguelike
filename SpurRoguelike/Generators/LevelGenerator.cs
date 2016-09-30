@@ -16,7 +16,8 @@ namespace SpurRoguelike.Generators
             Random = new Random(seed);
         }
 
-        public virtual Level Generate(LevelGenerationSettings settings, IList<MonsterClass> monsterClasses, IList<ItemClass> itemClasses)
+        public virtual Level Generate(LevelGenerationSettings settings, IList<MonsterClass> monsterClasses,
+            IList<ItemClass> itemClasses)
         {
             var field = new Field(
                 Random.Next(settings.Field.MinWidth, settings.Field.MaxWidth),
@@ -30,9 +31,13 @@ namespace SpurRoguelike.Generators
 
             var level = new Level(field, Seed);
 
-            PopulateWithMonsters(level, settings, monsterClasses.Where(c => c.Skill >= settings.Monsters.MinSkill && c.Skill <= settings.Monsters.MaxSkill).ToList());
+            PopulateWithMonsters(level, settings,
+                monsterClasses.Where(c => c.Skill >= settings.Monsters.MinSkill && c.Skill <= settings.Monsters.MaxSkill)
+                    .ToList());
 
-            PopulateWithItems(level, settings, itemClasses.Where(c => c.Level >= settings.Items.MinLevel && c.Level <= settings.Items.MaxLevel).ToList());
+            PopulateWithItems(level, settings,
+                itemClasses.Where(c => c.Level >= settings.Items.MinLevel && c.Level <= settings.Items.MaxLevel)
+                    .ToList());
 
             PopulateWithHealthPacks(level, settings);
 
@@ -48,7 +53,7 @@ namespace SpurRoguelike.Generators
             var yOffset = Random.Next(2, Math.Min(5, field.Height));
 
             var location = new Location(
-                placeAtLeft ? xOffset : field.Width - xOffset - 1, 
+                placeAtLeft ? xOffset : field.Width - xOffset - 1,
                 placeAtTop ? yOffset : field.Height - yOffset - 1);
 
             field[location] = CellType.PlayerStart;
@@ -56,20 +61,20 @@ namespace SpurRoguelike.Generators
 
         protected virtual void CarveDungeon(Field field, LevelGenerationSettings settings)
         {
-            var totalCells = field.Width * field.Height;
+            var totalCells = field.Width*field.Height;
             var emptyCells = 1;
 
             var head = field.PlayerStart;
             var farthestFromStart = head;
-            
-            while ((double) emptyCells / totalCells < settings.Field.FreeSpaceShare)
+
+            while ((double) emptyCells/totalCells < settings.Field.FreeSpaceShare)
             {
                 var stepDirection = Random.Select(Offset.StepOffsets);
 
                 var newHead = head + stepDirection;
                 if (newHead.X == 1 || newHead.X == field.Width - 2 || newHead.Y == 1 || newHead.Y == field.Height - 2)
                     continue;
-                
+
                 if (field[head] == CellType.Wall)
                 {
                     field[head] = CellType.Empty;
@@ -104,7 +109,7 @@ namespace SpurRoguelike.Generators
 
             var exits = field.GetCellsOfType(CellType.Exit).ToList();
 
-            while ((double) traps / totalFreeCells < settings.Traps.Density)
+            while ((double) traps/totalFreeCells < settings.Traps.Density)
             {
                 var location = new Location(Random.Next(1, field.Width - 1), Random.Next(1, field.Height - 1));
 
@@ -119,35 +124,39 @@ namespace SpurRoguelike.Generators
             }
         }
 
-        protected virtual void PopulateWithMonsters(Level level, LevelGenerationSettings settings, IList<MonsterClass> monsterClasses)
+        protected virtual void PopulateWithMonsters(Level level, LevelGenerationSettings settings,
+            IList<MonsterClass> monsterClasses)
         {
             var totalFreeCells = level.Field.GetCellsOfType(CellType.Empty).Count();
             var cellsWithMonsters = new HashSet<Location>();
-            
-            while ((double)cellsWithMonsters.Count / totalFreeCells < settings.Monsters.Density)
+
+            while ((double) cellsWithMonsters.Count/totalFreeCells < settings.Monsters.Density)
             {
-                var location = new Location(Random.Next(1, level.Field.Width - 1), Random.Next(1, level.Field.Height - 1));
+                var location = new Location(Random.Next(1, level.Field.Width - 1),
+                    Random.Next(1, level.Field.Height - 1));
 
                 if (level.Field[location] != CellType.Empty)
                     continue;
 
                 if (!cellsWithMonsters.Add(location))
                     continue;
-                
+
                 var monster = ChooseClass(monsterClasses, c => c.Rarity).Factory();
 
                 level.Spawn(location, monster);
             }
         }
 
-        protected virtual void PopulateWithItems(Level level, LevelGenerationSettings settings, IList<ItemClass> itemClasses)
+        protected virtual void PopulateWithItems(Level level, LevelGenerationSettings settings,
+            IList<ItemClass> itemClasses)
         {
             var totalFreeCells = level.Field.GetCellsOfType(CellType.Empty).Count();
             var cellsWithItems = new HashSet<Location>();
 
-            while ((double)cellsWithItems.Count / totalFreeCells < settings.Items.Density)
+            while ((double) cellsWithItems.Count/totalFreeCells < settings.Items.Density)
             {
-                var location = new Location(Random.Next(1, level.Field.Width - 1), Random.Next(1, level.Field.Height - 1));
+                var location = new Location(Random.Next(1, level.Field.Width - 1),
+                    Random.Next(1, level.Field.Height - 1));
 
                 if (level.Field[location] != CellType.Empty || level.GetEntity<Entity>(location) != null)
                     continue;
@@ -156,7 +165,7 @@ namespace SpurRoguelike.Generators
                     continue;
 
                 cellsWithItems.Add(location);
-                
+
                 var item = ChooseClass(itemClasses, c => c.Rarity).Factory();
 
                 level.Spawn(location, item);
@@ -182,9 +191,10 @@ namespace SpurRoguelike.Generators
             var totalFreeCells = level.Field.GetCellsOfType(CellType.Empty).Count();
             var cellsWithHealthPacks = new HashSet<Location>();
 
-            while ((double)cellsWithHealthPacks.Count / totalFreeCells < settings.HealthPacks.Density)
+            while ((double) cellsWithHealthPacks.Count/totalFreeCells < settings.HealthPacks.Density)
             {
-                var location = new Location(Random.Next(1, level.Field.Width - 1), Random.Next(1, level.Field.Height - 1));
+                var location = new Location(Random.Next(1, level.Field.Width - 1),
+                    Random.Next(1, level.Field.Height - 1));
 
                 if (level.Field[location] != CellType.Empty || level.GetEntity<Entity>(location) != null)
                     continue;

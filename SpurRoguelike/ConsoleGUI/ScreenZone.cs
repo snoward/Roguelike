@@ -14,6 +14,5 @@
         public readonly int Top;
         public readonly int Width;
         public readonly int Height;
-
     }
 }

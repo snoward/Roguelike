@@ -14,7 +14,8 @@ namespace SpurRoguelike.ConsoleGUI.Panels
         {
             Screen.Fill(ClientZone, new ConsoleCharacter(' ', ConsoleColor.Gray, ConsoleColor.Gray));
             for (int i = 0; i < HelpText.Length; i++)
-                DrawFullWidthMessage(BlankSize, BlankSize + i, new ConsoleMessage(HelpText[i], ConsoleColor.Black, ConsoleColor.Gray));
+                DrawFullWidthMessage(BlankSize, BlankSize + i,
+                    new ConsoleMessage(HelpText[i], ConsoleColor.Black, ConsoleColor.Gray));
         }
 
         private static readonly string[] HelpText =

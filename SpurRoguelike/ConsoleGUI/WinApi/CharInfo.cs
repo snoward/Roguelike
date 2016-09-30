@@ -11,8 +11,7 @@ namespace SpurRoguelike.ConsoleGUI.WinApi
             Attributes = attributes;
         }
 
-        [MarshalAs(UnmanagedType.U2)]
-        public readonly char UnicodeChar;
+        [MarshalAs(UnmanagedType.U2)] public readonly char UnicodeChar;
         public readonly CharAttributes Attributes;
     }
 }

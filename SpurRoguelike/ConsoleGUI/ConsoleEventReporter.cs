@@ -47,9 +47,9 @@ namespace SpurRoguelike.ConsoleGUI
         public void ReportDamage(Pawn pawn, int damage, Entity instigator)
         {
             if (gui.IsOnScreen(pawn))
-                gui.DisplayMessage(new ConsoleMessage(instigator == null ?
-                    $"{pawn.Name} takes {damage} damage." :
-                    $"{pawn.Name} takes {damage} damage from {instigator.Name}.", ConsoleColor.Gray));
+                gui.DisplayMessage(new ConsoleMessage(instigator == null
+                    ? $"{pawn.Name} takes {damage} damage."
+                    : $"{pawn.Name} takes {damage} damage from {instigator.Name}.", ConsoleColor.Gray));
         }
 
         public void ReportTrap(Pawn pawn)
@@ -72,7 +72,9 @@ namespace SpurRoguelike.ConsoleGUI
 
         public void ReportUpgrade(Pawn pawn, int attackBonus, int defenceBonus)
         {
-            gui.DisplayMessage(new ConsoleMessage($"{pawn.Name}'s skills grow: attack +{attackBonus}, defence +{defenceBonus}.", ConsoleColor.White));
+            gui.DisplayMessage(
+                new ConsoleMessage($"{pawn.Name}'s skills grow: attack +{attackBonus}, defence +{defenceBonus}.",
+                    ConsoleColor.White));
         }
 
         private readonly ConsoleGui gui;

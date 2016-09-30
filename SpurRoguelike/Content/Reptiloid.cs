@@ -9,8 +9,8 @@ namespace SpurRoguelike.Content
         public Reptiloid(string name, int attack, int defence, int health, int healthMaximum, double skill)
             : base(name, attack, defence, health, healthMaximum)
         {
-            sightRadius = (int) (10 + 20 * skill);
-            panicHealthLimit = healthMaximum / 10;
+            sightRadius = (int) (10 + 20*skill);
+            panicHealthLimit = healthMaximum/10;
             state = new StateIdle(this);
         }
 
@@ -24,7 +24,7 @@ namespace SpurRoguelike.Content
         private readonly int sightRadius;
         private readonly int panicHealthLimit;
         private State<Reptiloid> state;
-        
+
         private class StateIdle : State<Reptiloid>
         {
             public StateIdle(Reptiloid self)
@@ -39,7 +39,7 @@ namespace SpurRoguelike.Content
                     GoToState(() => new StateCowering(Self));
                     return;
                 }
-                
+
                 if (Self.IsInRange(Self.Level.Player, Self.sightRadius))
                 {
                     GoToState(() => new StateAttacking(Self, Self.Level.Player));
@@ -109,7 +109,7 @@ namespace SpurRoguelike.Content
             {
                 for (int i = 0; i < 4 && Self.Level.Field[Self.Location + stepDirection] == CellType.Wall; i++)
                     stepDirection = stepDirection.Turn(1);
-                
+
                 return stepDirection;
             }
 

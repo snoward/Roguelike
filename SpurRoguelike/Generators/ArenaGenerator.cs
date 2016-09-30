@@ -26,15 +26,18 @@ namespace SpurRoguelike.Generators
                 field[exitLocation + offset] = CellType.Wall;
         }
 
-        protected override void PopulateWithMonsters(Level level, LevelGenerationSettings settings, IList<MonsterClass> monsterClasses)
+        protected override void PopulateWithMonsters(Level level, LevelGenerationSettings settings,
+            IList<MonsterClass> monsterClasses)
         {
             var allFreeCells = level.Field.GetCellsOfType(CellType.Empty);
-            var farthestFromPlayer = allFreeCells.OrderByDescending(location => (location - level.Field.PlayerStart).Size()).First();
+            var farthestFromPlayer =
+                allFreeCells.OrderByDescending(location => (location - level.Field.PlayerStart).Size()).First();
 
             level.Spawn(farthestFromPlayer, monsterClasses.Single().Factory());
         }
 
-        public override Level Generate(LevelGenerationSettings settings, IList<MonsterClass> monsterClasses, IList<ItemClass> itemClasses)
+        public override Level Generate(LevelGenerationSettings settings, IList<MonsterClass> monsterClasses,
+            IList<ItemClass> itemClasses)
         {
             var level = base.Generate(settings, monsterClasses, itemClasses);
 

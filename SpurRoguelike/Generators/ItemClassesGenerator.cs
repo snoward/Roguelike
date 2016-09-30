@@ -19,7 +19,7 @@ namespace SpurRoguelike.Generators
 
             foreach (var options in itemClassOptions)
             {
-                var classesToGenerate = Math.Max(1, (int)Math.Round(Math.Sqrt(random.NextDouble()) * variance));
+                var classesToGenerate = Math.Max(1, (int) Math.Round(Math.Sqrt(random.NextDouble())*variance));
 
                 for (int i = 0; i < classesToGenerate; i++)
                 {
@@ -28,21 +28,22 @@ namespace SpurRoguelike.Generators
                     int defenceBonus;
                     GenerateItemStats(options.Level, out attackBonus, out defenceBonus);
 
-                    itemClasses.Add(new ItemClass(() => new Item(name, attackBonus, defenceBonus), options.Rarity, options.Level));
+                    itemClasses.Add(new ItemClass(() => new Item(name, attackBonus, defenceBonus), options.Rarity,
+                        options.Level));
                 }
             }
 
             return itemClasses;
         }
-        
+
         private void GenerateItemStats(int level, out int attackBonus, out int defenceBonus)
         {
             var bonus = random.Next(1, level + 1);
 
-            attackBonus = (int) (random.NextDouble() * bonus);
+            attackBonus = (int) (random.NextDouble()*bonus);
             defenceBonus = bonus - attackBonus;
         }
-        
+
         private readonly NameGenerator nameGenerator;
         private readonly Random random;
     }

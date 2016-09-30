@@ -7,10 +7,12 @@ namespace SpurRoguelike.ConsoleGUI.MouseDriver
     {
         public static ConsoleKeyInfo ConvertEventToKey(KeyEvent @event)
         {
-            return new ConsoleKeyInfo(@event.UnicodeChar, (ConsoleKey)@event.VirtualKeyCode, 
+            return new ConsoleKeyInfo(@event.UnicodeChar, (ConsoleKey) @event.VirtualKeyCode,
                 @event.ControlKeyState.HasFlag(ControlKeyState.ShiftPressed),
-                @event.ControlKeyState.HasFlag(ControlKeyState.LeftAltPressed) || @event.ControlKeyState.HasFlag(ControlKeyState.RightAltPressed),
-                @event.ControlKeyState.HasFlag(ControlKeyState.LeftCtrlPressed) || @event.ControlKeyState.HasFlag(ControlKeyState.RightCtrlPressed));
+                @event.ControlKeyState.HasFlag(ControlKeyState.LeftAltPressed) ||
+                @event.ControlKeyState.HasFlag(ControlKeyState.RightAltPressed),
+                @event.ControlKeyState.HasFlag(ControlKeyState.LeftCtrlPressed) ||
+                @event.ControlKeyState.HasFlag(ControlKeyState.RightCtrlPressed));
         }
     }
 }

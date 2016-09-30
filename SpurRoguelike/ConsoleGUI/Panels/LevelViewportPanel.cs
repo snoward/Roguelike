@@ -26,7 +26,9 @@ namespace SpurRoguelike.ConsoleGUI.Panels
 
             for (int x = Math.Max(0, -leftOffset); x < Math.Min(level.Field.Width, ClientZone.Width - leftOffset); x++)
             {
-                for (int y = Math.Max(0, -topOffset); y < Math.Min(level.Field.Height, ClientZone.Height - topOffset); y++)
+                for (int y = Math.Max(0, -topOffset);
+                    y < Math.Min(level.Field.Height, ClientZone.Height - topOffset);
+                    y++)
                 {
                     var location = new Location(x, y);
 
@@ -43,8 +45,8 @@ namespace SpurRoguelike.ConsoleGUI.Panels
 
         public void GetPlayerScreenCoords(out int left, out int top)
         {
-            left = ClientZone.Left + ClientZone.Width / 2;
-            top = ClientZone.Top + ClientZone.Height / 2;
+            left = ClientZone.Left + ClientZone.Width/2;
+            top = ClientZone.Top + ClientZone.Height/2;
         }
 
         public bool IsOnScreen(Entity entity)
@@ -55,12 +57,12 @@ namespace SpurRoguelike.ConsoleGUI.Panels
 
             var offset = entity.Location - level.Player.Location;
 
-            return Math.Abs(offset.XOffset) <= ClientZone.Width / 2 && Math.Abs(offset.YOffset) <= ClientZone.Height / 2;
+            return Math.Abs(offset.XOffset) <= ClientZone.Width/2 && Math.Abs(offset.YOffset) <= ClientZone.Height/2;
         }
 
-        private int LevelLeftOffset => ClientZone.Left + ClientZone.Width / 2 - levelProvider()?.Player?.Location.X ?? 0;
+        private int LevelLeftOffset => ClientZone.Left + ClientZone.Width/2 - levelProvider()?.Player?.Location.X ?? 0;
 
-        private int LevelTopOffset => ClientZone.Top + ClientZone.Height / 2 - levelProvider()?.Player?.Location.Y ?? 0;
+        private int LevelTopOffset => ClientZone.Top + ClientZone.Height/2 - levelProvider()?.Player?.Location.Y ?? 0;
 
         private static ConsoleCharacter GetLocationRepresentation(Location location, Level level)
         {

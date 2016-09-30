@@ -8,7 +8,7 @@ namespace SpurRoguelike.Generators
         public MonsterClassesGenerator(int seed, NameGenerator nameGenerator)
         {
             this.nameGenerator = nameGenerator;
-            
+
             random = new Random(seed);
         }
 
@@ -18,7 +18,7 @@ namespace SpurRoguelike.Generators
 
             foreach (var options in monsterClassOptions)
             {
-                var classesToGenerate = Math.Max(1, (int) Math.Round(Math.Sqrt(random.NextDouble()) * variance));
+                var classesToGenerate = Math.Max(1, (int) Math.Round(Math.Sqrt(random.NextDouble())*variance));
 
                 for (int i = 0; i < classesToGenerate; i++)
                 {
@@ -27,7 +27,8 @@ namespace SpurRoguelike.Generators
                     var attack = GenerateMonsterStat(options.Skill);
                     var defence = GenerateMonsterStat(options.Skill);
 
-                    classes.Add(new MonsterClass(() => options.Factory(name, options.Skill, health, attack, defence), options.Rarity, options.Skill));
+                    classes.Add(new MonsterClass(() => options.Factory(name, options.Skill, health, attack, defence),
+                        options.Rarity, options.Skill));
                 }
             }
 
@@ -36,14 +37,14 @@ namespace SpurRoguelike.Generators
 
         private int GenerateMonsterStat(double skill)
         {
-            return (int)(-3 + 40 * skill + -Math.Pow(random.NextDouble(), 0.1) * 10);
+            return (int) (-3 + 40*skill + -Math.Pow(random.NextDouble(), 0.1)*10);
         }
 
         private int GenerateMonsterHealth(double skill)
         {
-            return (int) ((1 - Math.Pow(random.NextDouble(), 0.1)) * 100 + 200 * skill);
+            return (int) ((1 - Math.Pow(random.NextDouble(), 0.1))*100 + 200*skill);
         }
-        
+
         private readonly NameGenerator nameGenerator;
         private readonly Random random;
     }

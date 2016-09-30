@@ -14,12 +14,12 @@ namespace SpurRoguelike
             {
                 var assembly = Assembly.LoadFile(Path.GetFullPath(assemblyName));
 
-                var botType = assembly.GetTypes().SingleOrDefault(type => typeof(IPlayerController).IsAssignableFrom(type));
+                var botType =
+                    assembly.GetTypes().SingleOrDefault(type => typeof(IPlayerController).IsAssignableFrom(type));
                 if (botType == null)
                     throw new BotLoaderException("No bot class is found in " + assemblyName);
 
                 return (IPlayerController) Activator.CreateInstance(botType);
-
             }
             catch (Exception error)
             {

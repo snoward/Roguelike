@@ -12,7 +12,7 @@ namespace SpurRoguelike.Content
 
         public abstract void Tick();
 
-        public abstract void GoToState<TState>(Func<TState> factory) where TState : State<T>; 
+        public abstract void GoToState<TState>(Func<TState> factory) where TState : State<T>;
 
         protected T Self;
     }

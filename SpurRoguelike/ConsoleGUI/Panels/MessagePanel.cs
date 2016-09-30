@@ -7,7 +7,7 @@ namespace SpurRoguelike.ConsoleGUI.Panels
         {
             this.message = message;
         }
-        
+
         public override void RedrawContents()
         {
             Screen.Fill(ClientZone, new ConsoleCharacter(' ', message.BackgroundColor, message.BackgroundColor));

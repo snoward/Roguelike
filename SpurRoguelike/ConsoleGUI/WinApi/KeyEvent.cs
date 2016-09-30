@@ -10,8 +10,7 @@ namespace SpurRoguelike.ConsoleGUI.WinApi
         public readonly short VirtualKeyCode;
         public readonly short VirtualScanCode;
 
-        [MarshalAs(UnmanagedType.U2)]
-        public readonly char UnicodeChar;
+        [MarshalAs(UnmanagedType.U2)] public readonly char UnicodeChar;
 
         public readonly ControlKeyState ControlKeyState;
     }

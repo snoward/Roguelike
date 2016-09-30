@@ -13,7 +13,7 @@ namespace SpurRoguelike.Content
         public override void Tick()
         {
             base.Tick();
-            
+
             if (!IsInRange(Level.Player, SeeRadius))
                 return;
 

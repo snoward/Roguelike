@@ -77,8 +77,11 @@ namespace SpurRoguelike.ConsoleGUI.Panels
             {
                 DrawStatLine(ref lineIndex, "Name: " + pawn.Name);
                 DrawStatLine(ref lineIndex, "Health: " + pawn.Health);
-                DrawStatLine(ref lineIndex, "Attack: " + pawn.Attack + (pawn.EquippedItem == null ? "" : " + " + pawn.EquippedItem.AttackBonus));
-                DrawStatLine(ref lineIndex, "Defence: " + pawn.Defence + (pawn.EquippedItem == null ? "" : " + " + pawn.EquippedItem.DefenceBonus));
+                DrawStatLine(ref lineIndex,
+                    "Attack: " + pawn.Attack + (pawn.EquippedItem == null ? "" : " + " + pawn.EquippedItem.AttackBonus));
+                DrawStatLine(ref lineIndex,
+                    "Defence: " + pawn.Defence +
+                    (pawn.EquippedItem == null ? "" : " + " + pawn.EquippedItem.DefenceBonus));
                 if (pawn.EquippedItem != null)
                     DrawStatLine(ref lineIndex, "Equipped: " + pawn.EquippedItem.Name);
                 return;
@@ -89,7 +92,7 @@ namespace SpurRoguelike.ConsoleGUI.Panels
 
         private void DrawStatLine(ref int index, string line)
         {
-            DrawFullWidthMessage(1, 3 + 2 * index++, new ConsoleMessage(line, ConsoleColor.Gray));
+            DrawFullWidthMessage(1, 3 + 2*index++, new ConsoleMessage(line, ConsoleColor.Gray));
         }
 
         private readonly Func<Level> levelProvider;
