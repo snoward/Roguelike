@@ -19,7 +19,10 @@ namespace SpurRoguelike.PlayerBot
 
         public abstract Turn MakeTurn(LevelView levelView);
 
-        public abstract void GoToState<TState>(Func<TState> factory) where TState : State<T>;
+        public void GoToState(Func<State<PlayerBot>> factory)
+        {
+            Bot.State = factory();
+        } 
 
         protected T Bot;
     }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using SpurRoguelike.Core;
 using SpurRoguelike.Core.Primitives;
@@ -16,7 +15,7 @@ namespace SpurRoguelike.PlayerBot
         public int Defence { get; private set; }
         public int Attack { get; private set; }
         public Location Location { get; private set; }
-        public ItemView Equipment { get; private set; }
+        public bool HasItem { get; private set; }
 
         public Turn MakeTurn(LevelView levelView, IMessageReporter messageReporter)
         {
@@ -40,140 +39,9 @@ namespace SpurRoguelike.PlayerBot
             return a.IsInRange(b, 1);
         }
 
-        private static IEnumerable<Location> BFS(LevelView levelView, Func<Location, bool> isTarget,
-            bool acceptPickup = false)
+        private static Turn NextStep(LevelView levelView, IEnumerable<Location> path)
         {
-            var queue = new Queue<Location>();
-            var start = levelView.Player.Location;
-            queue.Enqueue(start);
-
-            var visited = new HashSet<Location> {start};
-            var pred = new Dictionary<Location, Location>();
-
-            while (queue.Any())
-            {
-                var current = queue.Dequeue();
-                if (isTarget(current))
-                    return RevertPath(levelView, current, pred);
-
-                foreach (var offset in Offset.StepOffsets)
-                {
-                    var next = current + offset;
-
-                    if (!visited.Contains(next) && (levelView.Field[next] > CellType.Trap))
-                    {
-                        if (levelView.GetHealthPackAt(next).HasValue || levelView.GetItemAt(next).HasValue)
-                            if (!acceptPickup)
-                                continue;
-                        queue.Enqueue(next);
-                        visited.Add(next);
-                        pred[next] = current;
-                    }
-                }
-            }
-            var path = RevertPath(levelView, levelView.Player.Location, pred);
-            if (!path.Any())
-                path = BFS(levelView, isTarget, true);
-
-            return path;
-        }
-
-        private static int[,] CalculateInfluence(LevelView levelView)
-        {
-            const int safeDistance = 3;
-            const int monsterInfluence = 15;
-            const int wallInfluence = 10;
-            var cost = new int[levelView.Field.Width, levelView.Field.Height];
-
-            for (var y = 0; y < levelView.Field.Height; y++)
-                for (var x = 0; x < levelView.Field.Width; x++)
-                {
-                    var position = new Location(x, y);
-                    foreach (var monster in levelView.Monsters)
-                    {
-                        var distance = (monster.Location - position).Size();
-                        if (distance > safeDistance)
-                            continue;
-                        cost[x, y] += (int) (monsterInfluence/Math.Pow(2, distance - safeDistance));
-                    }
-                    if (levelView.Field[position] == CellType.Wall)
-                        foreach (var offset in Offset.StepOffsets)
-                        {
-                            var help = position + offset;
-                            if ((help.X > 0) && (help.X < levelView.Field.Width) && (help.Y > 0) &&
-                                (help.Y < levelView.Field.Height))
-                                cost[help.X, help.Y] += wallInfluence;
-                        }
-                    cost[x, y] = cost[x, y] == 0 ? 1 : cost[x, y];
-                }
-
-            return cost;
-        }
-
-        private static IEnumerable<Location> Dijkstra(LevelView levelView, Func<Location, bool> isTarget)
-        {
-            var cost = CalculateInfluence(levelView);
-            var current = levelView.Player.Location;
-            var dist = new Dictionary<Location, int> {[current] = 0};
-            var prev = new Dictionary<Location, Location>();
-            var notOpened = new HashSet<Location> {current};
-
-            for (var y = 0; y < levelView.Field.Height; y++)
-                for (var x = 0; x < levelView.Field.Width; x++)
-                {
-                    var location = new Location(x, y);
-                    if ((levelView.Field[location] > CellType.Trap) && (location != current) &&
-                        !levelView.GetItemAt(location).HasValue)
-                    {
-                        notOpened.Add(location);
-                        dist[location] = int.MaxValue;
-                    }
-                }
-            while (notOpened.Any())
-            {
-                var toOpen = default(Location);
-                var bestPrice = int.MaxValue;
-                foreach (var node in notOpened)
-                    if (dist.ContainsKey(node) && (dist[node] < bestPrice))
-                    {
-                        bestPrice = dist[node];
-                        toOpen = node;
-                    }
-                notOpened.Remove(toOpen);
-
-                if (isTarget(toOpen))
-                    return RevertPath(levelView, toOpen, prev);
-
-                foreach (var stepOffset in Offset.StepOffsets)
-                {
-                    var neighbour = toOpen + stepOffset;
-                    if (!notOpened.Contains(neighbour))
-                        continue;
-                    var alt = dist[toOpen] + cost[neighbour.X, neighbour.Y];
-                    if (alt < dist[neighbour])
-                    {
-                        dist[neighbour] = alt;
-                        prev[neighbour] = toOpen;
-                    }
-                }
-            }
-            return RevertPath(levelView, current, prev);
-        }
-
-        private static IEnumerable<Location> RevertPath(LevelView levelView, Location target,
-            Dictionary<Location, Location> prev)
-        {
-            var last = target;
-            var path = new List<Location>();
-
-            while (last != levelView.Player.Location)
-            {
-                path.Add(last);
-                last = prev[last];
-            }
-            path.Reverse();
-
-            return path;
+            return Turn.Step(path.First() - levelView.Player.Location);
         }
 
         private class StateIdle : State<PlayerBot>
@@ -194,29 +62,20 @@ namespace SpurRoguelike.PlayerBot
                     GoToState(() => new StateAttack(Bot));
                     return Bot.State.MakeTurn(levelView);
                 }
-                if (!levelView.Monsters.Any())
+                if (!levelView.Monsters.Any() && !Bot.HasItem)
                 {
                     GoToState(() => new StateEquip(Bot));
                     return Bot.State.MakeTurn(levelView);
                 }
-                if (!levelView.Monsters.Any() && (Bot.Health != maxHealth))
+
+                if (!levelView.Monsters.Any() && Bot.Health != maxHealth && levelView.HealthPacks.Any())
                 {
                     GoToState(() => new StateHeal(Bot));
                     return Bot.State.MakeTurn(levelView);
                 }
-                if (Bot.Health < panicHealth && !levelView.HealthPacks.Any())
-                {
-                    GoToState(() => new StateAttack(Bot));
-                    return Bot.State.MakeTurn(levelView);
-                }
                 var exitLocation = levelView.Field.GetCellsOfType(CellType.Exit).FirstOrDefault();
-                var path = BFS(levelView, location => location == exitLocation);
-                return Turn.Step(path.First() - levelView.Player.Location);
-            }
-
-            public override void GoToState<TState>(Func<TState> factory)
-            {
-                Bot.State = factory();
+                var path = Algorithm.BFS(levelView, location => location == exitLocation);
+                return NextStep(levelView, path);
             }
         }
 
@@ -225,34 +84,29 @@ namespace SpurRoguelike.PlayerBot
             public StateHeal(PlayerBot self) : base(self)
             {
             }
-
+            
             public override Turn MakeTurn(LevelView levelView)
             {
-                if (levelView.Monsters.Any() && (Bot.Health > panicHealth))
+                if (levelView.Monsters.Any() && ((Bot.Health > panicHealth) || !levelView.HealthPacks.Any()))
                 {
                     GoToState(() => new StateAttack(Bot));
                     return Bot.State.MakeTurn(levelView);
                 }
-                if ((!levelView.Monsters.Any() && (Bot.Health == maxHealth)) || !levelView.HealthPacks.Any())
+                if (Bot.Health == maxHealth || !levelView.HealthPacks.Any())
                 {
-                    GoToState(() => new StateFindExit(Bot));
+                    GoToState(() => new StateIdle(Bot));
                     return Bot.State.MakeTurn(levelView);
                 }
 
-                if (levelView.Monsters.Any() && !levelView.HealthPacks.Any())
-                {
-                    GoToState(() => new StateAttack(Bot));
-                    return Bot.State.MakeTurn(levelView);
-                }
+                var pathToHealth = Algorithm.Dijkstra(levelView,
+                    location => IsHealthPack(levelView, location));
 
-                var pathToHealth = Dijkstra(levelView, location => levelView.GetHealthPackAt(location).HasValue);
-
-                return Turn.Step(pathToHealth.First() - levelView.Player.Location);
+                return NextStep(levelView, pathToHealth);
             }
 
-            public override void GoToState<TState>(Func<TState> factory)
+            private static bool IsHealthPack(LevelView levelView, Location location)
             {
-                Bot.State = factory();
+                return levelView.GetHealthPackAt(location).HasValue;
             }
         }
 
@@ -277,10 +131,11 @@ namespace SpurRoguelike.PlayerBot
                     levelView.Player.TryGetEquippedItem(out currentItem);
                     if (GetItemValue(currentItem) < GetItemValue(bestItem))
                     {
-                        var pathToBestItem = BFS(levelView, location => location == bestItem.Location, true);
+                        var pathToBestItem = Algorithm.BFS(levelView, location => location == bestItem.Location, true);
                         return Turn.Step(pathToBestItem.First() - levelView.Player.Location);
                     }
-                    GoToState(() => new StateFindExit(Bot));
+                    Bot.HasItem = true;
+                    GoToState(() => new StateIdle(Bot));
                     return Bot.State.MakeTurn(levelView);
                 }
 
@@ -295,13 +150,8 @@ namespace SpurRoguelike.PlayerBot
                     GoToState(() => new StateIdle(Bot));
                     return Bot.State.MakeTurn(levelView);
                 }
-                var path = BFS(levelView, location => location == nearestItem.Location);
-                return Turn.Step(path.First() - Bot.Location);
-            }
-
-            public override void GoToState<TState>(Func<TState> factory)
-            {
-                Bot.State = factory();
+                var path = Algorithm.BFS(levelView, location => location == nearestItem.Location);
+                return NextStep(levelView, path);
             }
         }
 
@@ -315,7 +165,7 @@ namespace SpurRoguelike.PlayerBot
             {
                 if (Bot.Health < panicHealth && levelView.HealthPacks.Any())
                 {
-                    GoToState(() => new StateIdle(Bot));
+                    GoToState(() => new StateHeal(Bot));
                     return Bot.State.MakeTurn(levelView);
                 }
                 if (!levelView.Monsters.Any())
@@ -324,49 +174,14 @@ namespace SpurRoguelike.PlayerBot
                     return Bot.State.MakeTurn(levelView);
                 }
                 var nearbyMonster = levelView.Monsters.
-                    OrderBy(m => (m.Location - levelView.Player.Location).Size()).
+                    OrderBy(m => (m.Location - Bot.Location).Size()).
                     ThenBy(m => m.Health).
                     FirstOrDefault();
-                if (nearbyMonster.HasValue && IsInAttackRange(levelView.Player.Location, nearbyMonster.Location))
-                    return Turn.Attack(nearbyMonster.Location - levelView.Player.Location);
+                if (nearbyMonster.HasValue && IsInAttackRange(Bot.Location, nearbyMonster.Location))
+                    return Turn.Attack(nearbyMonster.Location - Bot.Location);
 
-                var path = BFS(levelView, location => location == nearbyMonster.Location);
-                return Turn.Step(path.First() - levelView.Player.Location);
-            }
-
-            public override void GoToState<TState>(Func<TState> factory)
-            {
-                Bot.State = factory();
-            }
-        }
-
-        private class StateFindExit : State<PlayerBot>
-        {
-            public StateFindExit(PlayerBot self) : base(self)
-            {
-            }
-
-            public override Turn MakeTurn(LevelView levelView)
-            {
-                if (levelView.Monsters.Any())
-                {
-                    GoToState(() => new StateIdle(Bot));
-                    return Bot.State.MakeTurn(levelView);
-                }
-                if ((levelView.Player.Health != maxHealth) && levelView.HealthPacks.Any())
-                {
-                    GoToState(() => new StateHeal(Bot));
-                    return Bot.State.MakeTurn(levelView);
-                }
-                var exitLocation = levelView.Field.GetCellsOfType(CellType.Exit).FirstOrDefault();
-                var path = BFS(levelView, location => exitLocation == location);
-
-                return Turn.Step(path.First() - levelView.Player.Location);
-            }
-
-            public override void GoToState<TState>(Func<TState> factory)
-            {
-                Bot.State = factory();
+                var path = Algorithm.BFS(levelView, location => location == nearbyMonster.Location);
+                return NextStep(levelView, path);
             }
         }
     }
